@@ -20,4 +20,4 @@ COPY mosquitto.conf /etc/mosquitto/mosquitto.conf
 EXPOSE 3000 1883 9001
 
 # 서버와 모스키토 동시 실행
-CMD sh -c "mosquitto -c /etc/mosquitto/mosquitto.conf & node index.js"
+CMD ["sh", "-c", "mosquitto -c /etc/mosquitto/mosquitto.conf & sleep 1 && node index.js"]
