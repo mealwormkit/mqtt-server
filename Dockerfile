@@ -1,17 +1,23 @@
-# Node.js 베이스 이미지 사용
 FROM node:18
 
-# 컨테이너 안에서 사용할 작업 디렉토리 설정
+# Mosquitto 설치
+RUN apt-get update && \
+    apt-get install -y mosquitto && \
+    apt-get clean
+
+# 앱 디렉토리 설정
 WORKDIR /app
 
-# package.json과 package-lock.json 복사
+# Node.js 파일 복사
 COPY package*.json ./
-
-# 의존성 설치
 RUN npm install
-
-# 나머지 소스 전체 복사
 COPY . .
 
-# 서버 실행 명령어
-CMD ["node", "index.js"]
+# Mosquitto 설정 복사
+COPY mosquitto.conf /etc/mosquitto/mosquitto.conf
+
+# 포트 오픈
+EXPOSE 3000 1883 9001
+
+# 서버와 모스키토 동시 실행
+CMD sh -c "mosquitto -c /etc/mosquitto/mosquitto.conf & node index.js"
