@@ -5,19 +5,20 @@ RUN apt-get update && \
     apt-get install -y mosquitto && \
     apt-get clean
 
-# 앱 디렉토리 설정
 WORKDIR /app
 
-# Node.js 파일 복사
+# Node.js 설치
 COPY package*.json ./
 RUN npm install
 COPY . .
 
-# Mosquitto 설정 복사
+# Mosquitto 설정
 COPY mosquitto.conf /etc/mosquitto/mosquitto.conf
 
-# 포트 오픈
-EXPOSE 3000 1883 9001
+# 포트 노출
+EXPOSE 3000
+EXPOSE 1883
+EXPOSE 9001
 
-# 서버와 모스키토 동시 실행
+# Mosquitto 먼저 실행 후 Node.js 서버 실행
 CMD ["sh", "-c", "mosquitto -c /etc/mosquitto/mosquitto.conf & sleep 1 && node index.js"]
