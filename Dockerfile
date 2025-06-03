@@ -2,6 +2,7 @@ FROM node:18
 
 RUN apt-get update && \
     apt-get install -y mosquitto && \
+    rm -rf /etc/mosquitto/conf.d/* && \
     apt-get clean
 
 WORKDIR /app
