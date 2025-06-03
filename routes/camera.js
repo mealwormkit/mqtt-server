@@ -5,27 +5,33 @@ const fs = require('fs');
 
 const router = express.Router();
 
-// 📦 multer 업로드 설정
+// 파일 저장 설정
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, 'uploads/'),
-  filename: (req, file, cb) => cb(null, Date.now() + path.extname(file.originalname)),
+  destination: function (req, file, cb) {
+    cb(null, 'uploads/');
+  },
+  filename: function (req, file, cb) {
+    const ext = path.extname(file.originalname);
+    const name = Date.now() + ext;
+    cb(null, name);
+  }
 });
+
 const upload = multer({ storage });
 
-// ✅ 업로드 API
+// 이미지 업로드 API
 router.post('/upload', upload.single('image'), (req, res) => {
-  console.log('📷 이미지 업로드됨:', req.file.filename);
+  console.log('📷 이미지 업로드됨:', req.file);
   res.send({
     message: '이미지 업로드 성공',
     filename: req.file.filename,
-    url: `/images/${req.file.filename}`,
+    url: `/images/${req.file.filename}`
   });
 });
 
-// ✅ 이미지 리스트 API
+// 이미지 목록 API
 router.get('/images/list', (req, res) => {
   const dir = path.join(__dirname, '../uploads');
-  console.log('✅ [/images/list] 요청 수신');
 
   fs.readdir(dir, (err, files) => {
     if (err) {
@@ -34,20 +40,14 @@ router.get('/images/list', (req, res) => {
     }
 
     const images = files
-      .filter(name => path.extname(name)) // 확장자 있는 파일만 필터링
+      .filter(name => path.extname(name)) // 확장자 필터
       .map(name => ({
         filename: name,
-        url: `/images/${name}`,
+        url: `/images/${name}`
       }));
 
     res.json(images);
   });
 });
 
-router.get('/images/list', (req, res) => {
-  console.log('✅ [/images/list] 요청 수신');
-  ...
-});
-
-
-module.exports = router; // 📌 반드시 맨 아래
+module.exports = router; // ✅ 반드시 마지막 줄
