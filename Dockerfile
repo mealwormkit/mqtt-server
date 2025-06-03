@@ -1,22 +1,17 @@
 FROM node:18
 
-RUN apt-get update && \
-    apt-get install -y mosquitto && \
-    rm -rf /etc/mosquitto/conf.d/* && \
-    apt-get clean
-
+# 작업 디렉토리 설정
 WORKDIR /app
 
+# Node.js 의존성 설치
 COPY package*.json ./
 RUN npm install
+
+# 나머지 앱 파일 복사
 COPY . .
 
-# 모스키토 설정 명확하게 복사
-COPY mosquitto.conf /etc/mosquitto/mosquitto.conf
-
-# 포트 노출
+# 포트 노출 (HTTP 서버용)
 EXPOSE 3000
-EXPOSE 9001
 
-# 모스키토가 먼저 실행되도록 대기 시간 추가
-CMD ["sh", "-c", "mosquitto -c /etc/mosquitto/mosquitto.conf & sleep 3 && node index.js"]
+# Node.js 서버 실행
+CMD ["node", "index.js"]
