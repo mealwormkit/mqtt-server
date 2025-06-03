@@ -21,3 +21,12 @@ EXPOSE 9001
 
 # Mosquitto 실행 → Node.js 실행
 CMD ["sh", "-c", "mosquitto -c /etc/mosquitto/mosquitto.conf & sleep 1 && node index.js"]
+
+
+# Mosquitto 설치 및 불필요 설정 제거
+RUN apt-get update && \
+    apt-get install -y mosquitto && \
+    rm -rf /etc/mosquitto/conf.d/* && \
+    apt-get clean
+
+COPY mosquitto.conf /etc/mosquitto/mosquitto.conf
