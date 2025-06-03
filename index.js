@@ -3,32 +3,45 @@ const path = require('path');
 const cameraRoutes = require('./routes/camera');
 const mqtt = require('mqtt');
 const cors = require('cors');
+// const { Server } = require('socket.io'); // 실시간 전송용 (옵션)
 
 const app = express();
 const PORT = 3000;
 
-// ✅ CORS 허용 (앱에서 API 접근 가능)
 app.use(cors());
 app.use(express.json());
 
-// ✅ MQTT 연결 (Docker 내부 Mosquitto 브로커 연결)
-const mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
- // 또는 'mqtt://mqtt' (docker-compose 시)
+// ✅ MQTT 브로커 연결
+const mqttClient = mqtt.connect('mqtt://broker.hivemq.com'); // 또는 외부 브로커 주소
+
 mqttClient.on('connect', () => {
   console.log('✅ MQTT 브로커 연결 성공');
-  mqttClient.subscribe('window/#'); // 필요시 토픽 설정
-});
-mqttClient.on('message', (topic, message) => {
-  console.log(`📩 ${topic} → ${message.toString()}`);
+  mqttClient.subscribe('sensor/temperature'); // 예시 토픽
 });
 
-// ✅ 정적 이미지 경로 설정 (브라우저에서 이미지 접근 가능)
+mqttClient.on('message', (topic, message) => {
+  try {
+    const data = JSON.parse(message.toString());
+    console.log(`🌡 Temperature: ${data.temp}°C, 💧 Humidity: ${data.humidity}%`);
+
+    // ▶ 여기에 웹 대시보드로 실시간 전송하는 코드 삽입 가능 (예: socket.io)
+    // io.emit('sensorData', {
+    //   temperature: data.temp,
+    //   humidity: data.humidity,
+    // });
+
+  } catch (err) {
+    console.error('❌ JSON 파싱 실패:', message.toString());
+  }
+});
+
+// ✅ 이미지 업로드된 경로를 정적 경로로 공개
 app.use('/images', express.static(path.join(__dirname, 'uploads')));
 
-// ✅ /upload 및 /images/list 엔드포인트 등록
+// ✅ 업로드, 리스트 라우터 연결
 app.use('/', cameraRoutes);
 
 // ✅ 서버 시작
 app.listen(PORT, () => {
-  console.log(`🚀 서버 실행 중: http://localhost:${PORT} ✅`);
+  console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
 });
