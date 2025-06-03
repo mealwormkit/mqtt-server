@@ -12,7 +12,8 @@ app.use(cors());
 app.use(express.json());
 
 // ✅ MQTT 연결 (Docker 내부 Mosquitto 브로커 연결)
-const mqttClient = mqtt.connect('mqtt://localhost'); // 또는 'mqtt://mqtt' (docker-compose 시)
+const mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
+ // 또는 'mqtt://mqtt' (docker-compose 시)
 mqttClient.on('connect', () => {
   console.log('✅ MQTT 브로커 연결 성공');
   mqttClient.subscribe('window/#'); // 필요시 토픽 설정
