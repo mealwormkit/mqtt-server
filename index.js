@@ -1,30 +1,21 @@
 const express = require('express');
 const path = require('path');
 const cameraRoutes = require('./routes/camera');
-const mqtt = require('mqtt');
+const mqtt = require('mqtt');           // ✅ mqtt 모듈 불러오기
 const cors = require('cors');
-// const { Server } = require('socket.io'); // 실시간 전송용 (옵션)
 
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
-app.use(express.json());
-
-// ✅ MQTT 브로커 연결
-app.listen(PORT, () => {
-  console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
-});
+// ✅ MQTT 클라이언트 선언
+const mqttClient = mqtt.connect('mqtt://broker.hivemq.com');
 
 mqttClient.on('connect', () => {
   console.log('✅ MQTT 브로커 연결 성공');
-  mqttClient.subscribe('sensor/temperature'); // 예시 토픽
+  mqttClient.subscribe('sensor/temperature');
 });
 
-mqttClient.on('message', (topic, message) => {
-  try {
-    const data = JSON.parse(message.toString());
-    console.log(`🌡 Temperature: ${data.temp}°C, 💧 Humidity: ${data.humidity}%`);
+
 
     // ▶ 여기에 웹 대시보드로 실시간 전송하는 코드 삽입 가능 (예: socket.io)
     // io.emit('sensorData', {
