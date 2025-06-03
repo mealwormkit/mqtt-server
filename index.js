@@ -5,7 +5,7 @@ const mqtt = require('mqtt');
 const cors = require('cors');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
+const PORT = 3000;
 
 // ✅ CORS 허용 (앱에서 API 접근 가능)
 app.use(cors());
