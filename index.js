@@ -6,13 +6,15 @@ const cors = require('cors');
 // const { Server } = require('socket.io'); // 실시간 전송용 (옵션)
 
 const app = express();
-const PORT = 3000;
+const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
 
 // ✅ MQTT 브로커 연결
-const mqttClient = mqtt.connect('mqtt://broker.hivemq.com'); // 또는 외부 브로커 주소
+app.listen(PORT, () => {
+  console.log(`🚀 서버 실행 중: http://localhost:${PORT}`);
+});
 
 mqttClient.on('connect', () => {
   console.log('✅ MQTT 브로커 연결 성공');
